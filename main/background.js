@@ -1,4 +1,5 @@
-import { app } from 'electron';
+import path from 'path';
+import { app, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
 
@@ -15,8 +16,13 @@ if (isProd) {
 
   const mainWindow = createWindow('main', {
     width: 1000,
-    height: 600,
+    height: 600
   });
+
+	const workerWindow = createWindow('worker', {
+		// show: false,
+    webPreferences: { nodeIntegration: true }
+	});
 
   if (isProd) {
     await mainWindow.loadURL('app://./home.html');
@@ -25,6 +31,29 @@ if (isProd) {
     await mainWindow.loadURL(`http://localhost:${port}/home`);
     mainWindow.webContents.openDevTools();
   }
+
+	mainWindow.on('closed', () => {
+	 // call quit to exit, otherwise the background windows will keep the app running
+	 app.quit()
+	})
+
+	// Main thread can receive directly from windows
+	ipcMain.on('to-main', (event, arg) => {
+	 console.log(arg)
+	});
+
+	// Windows can talk to each other via main
+	ipcMain.on('for-renderer', (event, arg) => {
+	 mainWindow.webContents.send('to-renderer', arg);
+	});
+
+	ipcMain.on('for-worker', (event, arg) => {
+	 workerWindow.webContents.send('to-worker', arg);
+	});
+
+
+	await workerWindow.loadFile(path.join(app.getAppPath(),'main', 'worker.html'))
+
 })();
 
 app.on('window-all-closed', () => {

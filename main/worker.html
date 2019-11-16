@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>I'm a hidden worker</title>
+  </head>
+  <body>
+    <script>
+			const {ipcRenderer} = require('electron');
+
+			// Send logs as messages to the main thread to show on the console
+			function log(value) {
+				ipcRenderer.send('to-main', process.pid + ': ' + value);
+			}
+
+			// let the main thread know this thread is ready to process something
+			function ready() {
+				ipcRenderer.send('ready')
+				ipcRenderer.send('to-renderer', 'Hello from the worker!')
+
+				log('Hello, worker')
+			}
+
+			// if message is received, pass it back to the renderer via the main thread
+			ipcRenderer.on('to-worker', (event, arg) => {
+				log('received ' + arg)
+				ipcRenderer.send('for-renderer', process.pid + ': reply to ' + arg)
+			});
+
+			ready()
+    </script>
+  </body>
+</html>

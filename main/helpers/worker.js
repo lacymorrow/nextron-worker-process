@@ -5,8 +5,8 @@ import {
 import * as Store from 'electron-store';
 
 export default function createWindow(windowName, options) {
-  const key = `window-state-${windowName}`;
-  const store = new Store({ name: key });
+  const name = `window-state-${windowName}`;
+  const store = new Store({ name });
   const defaultSize = {
     width: options.width,
     height: options.height,
@@ -14,7 +14,7 @@ export default function createWindow(windowName, options) {
   let state = {};
   let win;
 
-  const restore = () => store.get(key, defaultSize);
+  const restore = () => store.get(name, defaultSize);
 
   const getCurrentPosition = () => {
     const position = win.getPosition();
@@ -60,7 +60,7 @@ export default function createWindow(windowName, options) {
     if (!win.isMinimized() && !win.isMaximized()) {
       Object.assign(state, getCurrentPosition());
     }
-    store.set(key, state);
+    store.set(name, state);
   };
 
   state = ensureVisibleOnSomeDisplay(restore());
