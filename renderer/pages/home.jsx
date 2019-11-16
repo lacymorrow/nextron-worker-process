@@ -9,6 +9,7 @@ const Home = () => {
 	// Allow renderer process to receive communication
 	ipcRenderer && ipcRenderer.on('to-renderer', (event, arg) => {
 		console.log(arg)
+		alert(arg)
 	});
 
 

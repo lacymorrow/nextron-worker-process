@@ -20,7 +20,7 @@ if (isProd) {
   });
 
 	const workerWindow = createWindow('worker', {
-		// show: false,
+		show: false,  // <--- Comment me out to debug the worker window
     webPreferences: { nodeIntegration: true }
 	});
 
