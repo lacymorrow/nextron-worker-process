@@ -24,14 +24,6 @@ if (isProd) {
     webPreferences: { nodeIntegration: true }
 	});
 
-  if (isProd) {
-    await mainWindow.loadURL('app://./home.html');
-  } else {
-    const port = process.argv[2];
-    await mainWindow.loadURL(`http://localhost:${port}/home`);
-    mainWindow.webContents.openDevTools();
-  }
-
 	mainWindow.on('closed', () => {
 	 // call quit to exit, otherwise the background windows will keep the app running
 	 app.quit()
@@ -51,8 +43,17 @@ if (isProd) {
 	 workerWindow.webContents.send('to-worker', arg);
 	});
 
+  if (isProd) {
+    await mainWindow.loadURL('app://./home.html');
+		await workerWindow.loadURL(`app://./worker.html`);
+  } else {
+    const port = process.argv[2];
+    await mainWindow.loadURL(`http://localhost:${port}/home`);
+    mainWindow.webContents.openDevTools();
 
-	await workerWindow.loadFile(path.join(app.getAppPath(),'main', 'worker.html'))
+		await workerWindow.loadURL(`http://localhost:${port}/worker`);
+  }
+
 
 })();
 
