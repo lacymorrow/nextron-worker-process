@@ -20,6 +20,14 @@ const Worker = () => {
 			ipcRenderer.send('to-renderer', 'Hello from the worker!')
 
 			log('Hello, worker')
+
+			return () => {
+				// componentWillUnmount()
+				if (ipcRenderer) {
+					// unregister it
+					ipcRenderer.removeAllListeners('to-worker');
+				}
+			};
 		}
 	}, []); // Passing an empty array prevents effect on componentDidUpdate()
 
